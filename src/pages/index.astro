@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = 'Brain Injury Settlement Calculator | Estimate TBI Compensation | braininjurycalc.com';
+const description = 'Estimate the potential compensation range for a traumatic brain injury (TBI) claim based on injury severity (GCS), injury type, age, jurisdiction, and pre-injury income. Free, informational.';
+---
+<BaseLayout title={title} description={description}>
+  <h1>Brain Injury Settlement Calculator</h1>
+  <p><em>Reviewed by Greer Holiday (GH), Editor-in-Chief &mdash; Neurotrauma Practice. Updated May 2026.</em></p>
+
+  <p>Traumatic brain injuries (TBI) sit on a wide spectrum &mdash; from a single concussion that resolves in weeks to severe diffuse axonal injury that requires lifetime attendant care. The compensation framework reflects that spread. A clearly documented mild TBI with persistent post-concussive symptoms can produce settlements in the low six figures; a severe TBI with documented cognitive deficits, lost vocational capacity, and ongoing rehabilitation needs routinely produces seven- and eight-figure recoveries; catastrophic TBI with a vegetative or minimally conscious outcome can exceed $20 million. This calculator estimates the potential recovery range based on the factors that drive TBI case valuations. It is informational only and not a substitute for evaluation by an experienced catastrophic injury attorney with neurotrauma experience.</p>
+
+  <h2>Run the estimate</h2>
+
+  <p>Enter the key facts of the injury. The output reflects published settlement data, Glasgow Coma Scale (GCS) severity classification, and the life-care planning frameworks used in neurotrauma litigation.</p>
+
+  <form id="calc" novalidate>
+    <label for="injury-severity">Injury severity (Glasgow Coma Scale at admission)</label>
+    <select id="injury-severity" name="injury-severity">
+      <option value="mild">Mild TBI / concussion (GCS 13&ndash;15)</option>
+      <option value="moderate">Moderate TBI (GCS 9&ndash;12)</option>
+      <option value="severe">Severe TBI (GCS 3&ndash;8)</option>
+      <option value="catastrophic">Severe with vegetative / locked-in / minimally conscious state</option>
+    </select>
+
+    <label for="injury-type">Type of brain injury</label>
+    <select id="injury-type" name="injury-type">
+      <option value="concussion">Concussion / mild TBI</option>
+      <option value="diffuse-axonal">Diffuse axonal injury (DAI)</option>
+      <option value="focal-contusion">Focal contusion</option>
+      <option value="subdural">Subdural hematoma</option>
+      <option value="epidural">Epidural hematoma</option>
+      <option value="anoxic">Anoxic / hypoxic brain injury</option>
+      <option value="penetrating">Penetrating brain injury</option>
+    </select>
+
+    <label for="cause">Cause of injury</label>
+    <select id="cause" name="cause">
+      <option value="motor-vehicle">Motor vehicle accident</option>
+      <option value="fall">Fall</option>
+      <option value="workplace">Workplace accident</option>
+      <option value="sports">Sports / recreation</option>
+      <option value="assault">Assault</option>
+      <option value="medical">Medical malpractice / birth injury</option>
+      <option value="military">Military / blast</option>
+    </select>
+
+    <label for="age">Age at injury</label>
+    <input id="age" name="age" type="number" value="35" min="1" max="100" />
+
+    <label for="state">State where injury occurred</label>
+    <input id="state" name="state" type="text" value="California" />
+
+    <label for="annual-income">Pre-injury annual income (USD)</label>
+    <input id="annual-income" name="annual-income" type="number" value="60000" min="0" />
+
+    <button type="submit">Estimate recovery range</button>
+  </form>
+
+  <p id="result" aria-live="polite"></p>
+
+  <h2>How the calculator works</h2>
+
+  <p>Traumatic brain injury compensation is built from several damages components, each driven by different facts:</p>
+
+  <ol>
+    <li><strong>Medical expenses (past and future).</strong> Initial emergency care, neurosurgical intervention (where applicable), inpatient and outpatient rehabilitation, neuropsychological testing, cognitive and speech therapy, medications, durable equipment, and recurring services. For moderate and severe TBI, a life-care planner itemizes future needs year by year through expected lifespan.</li>
+    <li><strong>Lost earnings (past and future).</strong> Pre-injury earning capacity reduced by post-injury residual earning capacity. TBI is particularly damaging to cognitive work; many TBI survivors cannot return to their pre-injury occupation even when physical function appears preserved.</li>
+    <li><strong>Pain and suffering / general damages.</strong> Non-economic damages for the injury itself, ongoing headaches, mood disturbance, loss of identity, loss of life enjoyment, and the impact of cognitive impairment on daily life. Often the largest single component for mild and moderate TBI cases.</li>
+    <li><strong>Loss of consortium.</strong> Spouse and (in some states) children and parents claims for loss of the injured person's society, companionship, services, and the relational changes that follow significant TBI.</li>
+    <li><strong>Punitive damages.</strong> Available in cases of gross negligence (impaired driving, intentional misconduct, repeated safety violations); can substantially increase the recovery.</li>
+  </ol>
+
+  <p>The calculator uses published settlement averages by severity as base ranges, then adjusts for jurisdiction, age, pre-injury income, and injury type. See our <a href="/guides/how-brain-injury-settlements-are-calculated">detailed methodology guide</a> for the underlying math.</p>
+
+  <h2>Compensation ranges by severity</h2>
+
+  <p>Published verdict and settlement data shows the following approximate distribution by severity:</p>
+
+  <ul>
+    <li><strong>Mild TBI / concussion (GCS 13&ndash;15):</strong> $50K&ndash;$500K. Cases with documented post-concussive syndrome, neuropsychological deficits, or vocational impact reach the upper end. Single-incident concussions with full recovery in weeks tend to be at the lower end.</li>
+    <li><strong>Moderate TBI (GCS 9&ndash;12):</strong> $500K&ndash;$3M. Documented cognitive deficits, partial vocational impact, and ongoing rehabilitation needs. Outcomes vary widely with recovery trajectory through the first 12&ndash;24 months.</li>
+    <li><strong>Severe TBI (GCS 3&ndash;8), non-vegetative outcome:</strong> $2M&ndash;$15M. Substantial cognitive impairment, often unable to return to pre-injury employment, attendant care often required, significant lifetime medical needs.</li>
+    <li><strong>Severe TBI with vegetative, minimally conscious, or locked-in state:</strong> $5M&ndash;$25M+. Lifetime 24-hour care, extensive equipment needs, total lost earning capacity. Verdicts in this category have exceeded $50M in extreme cases.</li>
+  </ul>
+
+  <p>These are general ranges from publicly available data. Specific case outcomes depend on jurisdiction, defendant solvency, liability strength, age at injury, and case-specific facts.</p>
+
+  <h2>Factors that move the recovery up or down</h2>
+
+  <ul>
+    <li><strong>Liability clarity.</strong> Clear liability (rear-end collision by an intoxicated driver, clear premises hazard, clear surgical error) commands settlements at the high end. Disputed liability or comparative-fault cases settle for less.</li>
+    <li><strong>Age at injury.</strong> Younger victims have larger economic damages claims (more lost earning years, longer lifetime of care). Pediatric severe TBI cases regularly produce $10M+ settlements. Elderly TBI cases face reduced lost-earnings claims but still carry significant medical components.</li>
+    <li><strong>Jurisdiction.</strong> California, New York, Pennsylvania, Illinois, and New Jersey have plaintiff-friendly catastrophic injury practice with predictable high outcomes. Texas, Georgia, and several Southern and Mountain West states have damage caps or more conservative juries.</li>
+    <li><strong>Available insurance and defendant assets.</strong> Settlement is constrained by defendant insurance limits and assets. Commercial defendants and institutional defendants typically produce higher recoveries than individual defendants with minimum-limits insurance.</li>
+    <li><strong>Pre-injury income and vocational profile.</strong> High pre-injury cognitive-work income (knowledge workers, professionals, executives) produces proportionally larger lost-earnings claims because TBI tends to impair the cognitive function those jobs require.</li>
+    <li><strong>Cognitive and vocational impact.</strong> A mild TBI in a neurosurgeon ends a career; the same injury in a worker whose job has lower cognitive demands may have minimal vocational impact. Vocational rehabilitation analysis is critical.</li>
+    <li><strong>Family circumstances.</strong> Loss of consortium for a spouse, plus (in some states) parent-child claims, can add seven figures to a serious TBI case.</li>
+  </ul>
+
+  <h2>What this calculator is not</h2>
+
+  <ul>
+    <li>It does not predict the outcome of any specific case.</li>
+    <li>It does not account for liability disputes, comparative fault, defendant insurance availability, or specific medical complications.</li>
+    <li>It does not substitute for the detailed life-care plan, neuropsychological evaluation, and economic-loss analysis that experienced neurotrauma attorneys perform.</li>
+    <li>It does not provide legal or medical advice. After a brain injury, the most important steps are ongoing neurological and rehabilitation care and consultation with an experienced catastrophic injury attorney.</li>
+  </ul>
+
+  <h2>Time-sensitive considerations</h2>
+
+  <p>Brain injury cases have statute-of-limitations deadlines that vary by state (typically 1&ndash;3 years from injury for personal injury, with some tolling for incapacity and longer deadlines for medical malpractice claims and minor victims). Evidence preservation is critical: accident scene photos, witness statements, vehicle event-data recorders, helmet or PPE inspection, employer records, the entire neuroimaging series (CT, MRI, DTI where available), and contemporaneous medical records all need to be gathered while fresh. Diffuse axonal injury and other diffuse TBI patterns can be invisible on standard CT and require careful MRI sequencing within a defined window. An attorney can preserve evidence and protect deadlines while the family focuses on recovery.</p>
+
+  <h2>Where to learn more</h2>
+
+  <p>For detailed methodology, see <a href="/guides/how-brain-injury-settlements-are-calculated">how brain injury settlements are calculated</a>. For information about injury classifications and prognosis, see <a href="/guides/types-of-traumatic-brain-injuries-and-prognosis">types of traumatic brain injuries and prognosis</a>. For practical guidance after the injury, see <a href="/guides/what-to-do-after-brain-injury">what to do after a brain injury</a>. For common myths and misconceptions, see <a href="/guides/common-brain-injury-claim-misconceptions">common brain injury claim misconceptions</a>.</p>
+
+  <script>
+    const form = document.getElementById('calc');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const severity = document.getElementById('injury-severity').value;
+        const injuryType = document.getElementById('injury-type').value;
+        const cause = document.getElementById('cause').value;
+        const age = parseInt(document.getElementById('age').value, 10);
+        const income = parseInt(document.getElementById('annual-income').value, 10);
+        const state = document.getElementById('state').value;
+
+        const baseRanges = {
+          'mild': [50000, 500000],
+          'moderate': [500000, 3000000],
+          'severe': [2000000, 15000000],
+          'catastrophic': [5000000, 25000000]
+        };
+        const severityAdj = {
+          'concussion': 1.0,
+          'diffuse-axonal': 1.15,
+          'focal-contusion': 1.05,
+          'subdural': 1.1,
+          'epidural': 1.0,
+          'anoxic': 1.2,
+          'penetrating': 1.15
+        };
+        const stateMult = {
+          'California': 1.15, 'New York': 1.15, 'Pennsylvania': 1.1,
+          'Illinois': 1.1, 'New Jersey': 1.1, 'Texas': 0.9,
+          'Georgia': 0.9, 'Florida': 1.0
+        };
+
+        const [baseLow, baseHigh] = baseRanges[severity] || [500000, 3000000];
+        const typeAdj = severityAdj[injuryType] || 1.0;
+        const sMult = stateMult[state] || 1.0;
+        const ageMult = age < 25 ? 1.25 : (age < 40 ? 1.1 : (age > 65 ? 0.85 : 1.0));
+        const incomeMult = income > 100000 ? 1.2 : (income > 60000 ? 1.05 : (income < 30000 ? 0.9 : 1.0));
+
+        const low = Math.round(baseLow * typeAdj * sMult * ageMult * incomeMult);
+        const high = Math.round(baseHigh * typeAdj * sMult * ageMult * incomeMult);
+
+        const fmt = (n) => '$' + n.toLocaleString();
+        document.getElementById('result').innerHTML =
+          `Estimated recovery range: <strong>${fmt(low)} &ndash; ${fmt(high)}</strong>. <em>Wide range reflects liability strength, available insurance, jurisdictional variation, neuropsychological findings, and case-specific facts. Verify with a licensed catastrophic injury attorney experienced in neurotrauma.</em>`;
+      });
+    }
+  </script>
+</BaseLayout>
