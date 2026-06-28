@@ -3,11 +3,64 @@ export interface Props {
   title: string;
   description: string;
   canonical?: string;
+  image?: string;
+  pageSchema?: any;
 }
 
-const { title, description, canonical } = Astro.props;
-const siteUrl = 'https://braininjurycalc.com';
+const { title, description, canonical, image, pageSchema } = Astro.props;
+
+// Site constants
+const siteUrl = "https://braininjurycalc.com";
+const siteName = "BrainInjuryCalc";
+const brandName = "BrainInjuryCalc";
+const publisherName = "The Click Lab Agency LLC";
+const publisherUrl = "https://theclicklab.agency";
+
+// Editor / reviewer — matches the named bylines on methodology and editorial pages
+const editorInChief = {
+  name: "Greer Holiday",
+  credentials: "Paralegal (TBI litigation)",
+  role: "Editor-in-Chief & Neurotrauma Practice Lead",
+  bio: "Greer Holiday (Paralegal (TBI litigation)) is the Editor-in-Chief & Neurotrauma Practice Lead of BrainInjuryCalc, overseeing methodology and editorial standards.",
+  url: `${siteUrl}/editorial/`,
+};
+
 const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString();
+const ogImage = image ? new URL(image, siteUrl).toString() : new URL('/og-default.png', siteUrl).toString();
+
+const organizationSchema = {
+  '@type': 'Organization',
+  '@id': `${publisherUrl}/#organization`,
+  name: publisherName,
+  url: publisherUrl,
+  legalName: publisherName,
+};
+
+const personSchema = {
+  '@type': 'Person',
+  '@id': `${siteUrl}/#editor-in-chief`,
+  name: editorInChief.name,
+  honorificSuffix: editorInChief.credentials,
+  jobTitle: editorInChief.role,
+  description: editorInChief.bio,
+  url: editorInChief.url,
+  worksFor: { '@id': `${publisherUrl}/#organization` },
+};
+
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': `${siteUrl}/#website`,
+  url: siteUrl,
+  name: siteName,
+  alternateName: brandName,
+  publisher: { '@id': `${publisherUrl}/#organization` },
+  inLanguage: 'en-US',
+};
+
+const siteGraph = {
+  '@context': 'https://schema.org',
+  '@graph': [organizationSchema, personSchema, websiteSchema],
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -18,22 +71,34 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString(
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={siteName} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" set:html={JSON.stringify(siteGraph)}></script>
+    {pageSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(pageSchema)}></script>
+    )}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6434377544325972" crossorigin="anonymous"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CS73ZHKX92"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-CS73ZHKX92');</script>
   </head>
-  <body>
+<body>
     <header class="site-header">
       <div class="container">
         <a href="/" class="site-logo">BrainInjuryCalc</a>
         <nav class="site-nav" aria-label="Primary">
           <a href="/">Calculator</a>
-          <a href="/case-types">Injury Types</a>
-          <a href="/guides">Guides</a>
-          <a href="/about">About</a>
+          <a href="/case-types/">Injury Types</a>
+          <a href="/guides/">Guides</a>
+          <a href="/about/">About</a>
         </nav>
       </div>
     </header>
@@ -47,13 +112,13 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString(
     <footer class="site-footer">
       <div class="container">
         <nav class="footer-nav" aria-label="Footer">
-          <a href="/about">About</a>
-          <a href="/methodology">Methodology</a>
-          <a href="/editorial">Editorial Team</a>
-          <a href="/contact">Contact</a>
-          <a href="/faq">FAQ</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
+          <a href="/about/">About</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/editorial/">Editorial Team</a>
+          <a href="/contact/">Contact</a>
+          <a href="/faq/">FAQ</a>
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
         </nav>
         <p class="footer-credit">&copy; 2026 The Click Lab &mdash; Reviewed by the Editorial Team. Informational only, not legal or medical advice.</p>
       </div>
