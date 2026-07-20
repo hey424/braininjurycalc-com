@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LeadCapture from '../components/LeadCapture.astro';
 const title = 'Brain Injury Settlement Calculator | Estimate TBI Compensation | braininjurycalc.com';
 const description = 'Estimate the potential compensation range for a traumatic brain injury (TBI) claim based on injury severity (GCS), injury type, age, jurisdiction, and pre-injury income. Free, informational.';
 ---
@@ -56,7 +57,10 @@ const description = 'Estimate the potential compensation range for a traumatic b
     <button type="submit">Estimate recovery range</button>
   </form>
 
-  <p id="result" aria-live="polite"></p>
+  
+
+  <LeadCapture caseType="brain_injury" caseTypeLabel="Brain Injury" />
+<p id="result" aria-live="polite"></p>
 
   <h2>How the calculator works</h2>
 
@@ -70,7 +74,7 @@ const description = 'Estimate the potential compensation range for a traumatic b
     <li><strong>Punitive damages.</strong> Available in cases of gross negligence (impaired driving, intentional misconduct, repeated safety violations); can substantially increase the recovery.</li>
   </ol>
 
-  <p>The calculator uses published settlement averages by severity as base ranges, then adjusts for jurisdiction, age, pre-injury income, and injury type. See our <a href="/guides/how-brain-injury-settlements-are-calculated">detailed methodology guide</a> for the underlying math.</p>
+  <p>The calculator uses published settlement averages by severity as base ranges, then adjusts for jurisdiction, age, pre-injury income, and injury type. See our <a href="/guides/how-brain-injury-settlements-are-calculated/">detailed methodology guide</a> for the underlying math.</p>
 
   <h2>Compensation ranges by severity</h2>
 
@@ -112,7 +116,7 @@ const description = 'Estimate the potential compensation range for a traumatic b
 
   <h2>Where to learn more</h2>
 
-  <p>For detailed methodology, see <a href="/guides/how-brain-injury-settlements-are-calculated">how brain injury settlements are calculated</a>. For information about injury classifications and prognosis, see <a href="/guides/types-of-traumatic-brain-injuries-and-prognosis">types of traumatic brain injuries and prognosis</a>. For practical guidance after the injury, see <a href="/guides/what-to-do-after-brain-injury">what to do after a brain injury</a>. For common myths and misconceptions, see <a href="/guides/common-brain-injury-claim-misconceptions">common brain injury claim misconceptions</a>.</p>
+  <p>For detailed methodology, see <a href="/guides/how-brain-injury-settlements-are-calculated/">how brain injury settlements are calculated</a>. For information about injury classifications and prognosis, see <a href="/guides/types-of-traumatic-brain-injuries-and-prognosis/">types of traumatic brain injuries and prognosis</a>. For practical guidance after the injury, see <a href="/guides/what-to-do-after-brain-injury/">what to do after a brain injury</a>. For common myths and misconceptions, see <a href="/guides/common-brain-injury-claim-misconceptions/">common brain injury claim misconceptions</a>.</p>
 
   <script>
     const form = document.getElementById('calc');

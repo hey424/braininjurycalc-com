@@ -1,0 +1,370 @@
+---
+/**
+ * LeadCapture.astro — TCPA-compliant lead capture form
+ *
+ * Drop into any page (typically inline below the calculator result).
+ * Submits to the configured LEAD_INTAKE_ENDPOINT (Cloudflare Worker).
+ *
+ * Props:
+ *   - caseType: required, machine-readable code (e.g. "auto_accident", "mesothelioma")
+ *   - caseTypeLabel: required, human-readable label (e.g. "Car Accident", "Mesothelioma")
+ *   - calculatedAmount?: optional, pre-fill from calculator result for context
+ */
+export interface Props {
+  caseType: string;
+  caseTypeLabel: string;
+  calculatedAmount?: string;
+}
+
+const { caseType, caseTypeLabel, calculatedAmount } = Astro.props;
+
+// Worker endpoint — currently using the workers.dev URL.
+// Switch to https://leads.theclicklab.agency/intake once theclicklab.agency is a CF zone.
+const LEAD_INTAKE_ENDPOINT = 'https://leads-intake.hey-287.workers.dev/intake';
+---
+
+<section class="lead-capture" aria-labelledby="lead-capture-title">
+  <div class="lead-capture__header">
+    <h2 id="lead-capture-title">Talk to a {caseTypeLabel} attorney — free</h2>
+    {calculatedAmount && (
+      <p class="lead-capture__amount-context">
+        Your estimate is <strong>{calculatedAmount}</strong> — a verified attorney can review your case at no cost and tell you if it's worth pursuing.
+      </p>
+    )}
+    {!calculatedAmount && (
+      <p class="lead-capture__amount-context">
+        Free, no-obligation case review from a verified attorney in your area. Most respond within 24 hours.
+      </p>
+    )}
+  </div>
+
+  <form class="lead-capture__form" method="POST" data-endpoint={LEAD_INTAKE_ENDPOINT} data-case-type={caseType} novalidate>
+    {/* Honeypot — hidden from humans, irresistible to bots */}
+    <div class="lead-capture__honeypot" aria-hidden="true">
+      <label for="lc_website_url">Website (leave blank)</label>
+      <input type="text" id="lc_website_url" name="website_url" tabindex="-1" autocomplete="off" />
+    </div>
+
+    {/* Hidden fields populated at submit time */}
+    <input type="hidden" name="case_type" value={caseType} />
+    <input type="hidden" name="case_type_label" value={caseTypeLabel} />
+    <input type="hidden" name="source_url" value="" data-lc="source_url" />
+    <input type="hidden" name="user_agent" value="" data-lc="user_agent" />
+    <input type="hidden" name="consent_timestamp" value="" data-lc="consent_timestamp" />
+    <input type="hidden" name="consent_text" value="" data-lc="consent_text" />
+
+    <div class="lead-capture__row">
+      <div class="lead-capture__field">
+        <label for="lc_first_name">First name *</label>
+        <input type="text" id="lc_first_name" name="first_name" required autocomplete="given-name" />
+      </div>
+      <div class="lead-capture__field">
+        <label for="lc_last_name">Last name *</label>
+        <input type="text" id="lc_last_name" name="last_name" required autocomplete="family-name" />
+      </div>
+    </div>
+
+    <div class="lead-capture__field">
+      <label for="lc_email">Email *</label>
+      <input type="email" id="lc_email" name="email" required autocomplete="email" />
+    </div>
+
+    <div class="lead-capture__field">
+      <label for="lc_phone">Phone *</label>
+      <input type="tel" id="lc_phone" name="phone" required inputmode="tel" autocomplete="tel" pattern="[0-9()+\-.\s]{10,}" maxlength="20" placeholder="(310) 555-1234" />
+    </div>
+
+    <div class="lead-capture__field">
+      <label for="lc_zip">ZIP code *</label>
+      <input type="text" id="lc_zip" name="zip" required pattern="[0-9]{5}" maxlength="5" inputmode="numeric" autocomplete="postal-code" placeholder="90210" />
+    </div>
+
+    <div class="lead-capture__field">
+      <label for="lc_incident_date">Approximately when did the incident happen?</label>
+      <input type="date" id="lc_incident_date" name="incident_date" max="2026-12-31" />
+    </div>
+
+    <div class="lead-capture__field">
+      <label for="lc_case_description">Briefly describe what happened *</label>
+      <textarea id="lc_case_description" name="case_description" rows="3" required placeholder="A few sentences is fine — the attorney will follow up for more detail."></textarea>
+    </div>
+
+    <div class="lead-capture__consent">
+      <label class="lead-capture__consent-label">
+        <input type="checkbox" id="lc_consent" name="consent" required />
+        <span id="lc_consent_text">
+          By checking this box and submitting, I consent to be contacted by phone, text, and email by The Click Lab Agency LLC and one or more attorneys or their agents about my potential claim, including via automated dialing technology, at the number provided. Consent is not a condition of any purchase. Message and data rates may apply. I confirm I am 18 or older, a US resident, and the information provided is true. To opt out of future contact, email hey@theclicklab.agency or visit https://theclicklab.agency/optout.
+        </span>
+      </label>
+    </div>
+
+    <p class="lead-capture__validation" role="alert" aria-live="assertive" hidden></p>
+
+    <button type="submit" class="lead-capture__submit">Get my free case review &rarr;</button>
+
+    <p class="lead-capture__disclaimer">
+      This is an advertisement. The Click Lab Agency LLC is not a law firm and does not provide legal services or representation. We are a media supplier that connects users with attorneys licensed in their jurisdiction. No attorney-client relationship is created by submitting this form.
+    </p>
+  </form>
+
+  <div class="lead-capture__success" role="status" aria-live="polite" hidden>
+    <h3>Thanks &mdash; we have your request</h3>
+    <p>A verified attorney will reach out within 24 hours about your {caseTypeLabel.toLowerCase()} case. Watch your email.</p>
+  </div>
+
+  <div class="lead-capture__error" role="alert" hidden>
+    <p><strong>We couldn't submit your request right now.</strong> Please try again or email us at <a href="mailto:hey@theclicklab.agency">hey@theclicklab.agency</a> and we'll connect you with an attorney.</p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const forms = document.querySelectorAll('.lead-capture__form');
+    forms.forEach((form) => {
+      const formEl = form as HTMLFormElement;
+      formEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const honeypot = formEl.querySelector('input[name="website_url"]') as HTMLInputElement | null;
+        if (honeypot && honeypot.value.trim() !== '') {
+          // Silent drop — looks successful but goes nowhere
+          formEl.hidden = true;
+          (formEl.parentElement?.querySelector('.lead-capture__success') as HTMLElement | null)?.removeAttribute('hidden');
+          return;
+        }
+
+        // Client-side gate — phone + consent are mandatory. The form carries
+        // `novalidate`, so native `required` attributes are NOT enforced; the
+        // Worker is the hard gate, but block here for a clear inline message.
+        const failValidation = (msg: string, focusEl: HTMLElement | null) => {
+          const el = formEl.querySelector('.lead-capture__validation') as HTMLElement | null;
+          if (el) { el.textContent = msg; el.hidden = false; }
+          focusEl?.focus();
+        };
+        const clearValidation = () => {
+          const el = formEl.querySelector('.lead-capture__validation') as HTMLElement | null;
+          if (el) { el.textContent = ''; el.hidden = true; }
+        };
+        clearValidation();
+
+        const phoneEl = formEl.querySelector('input[name="phone"]') as HTMLInputElement | null;
+        const phoneDigits = (phoneEl?.value || '').replace(/\D/g, '');
+        if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+          failValidation('Please enter a valid phone number (at least 10 digits) so an attorney can reach you.', phoneEl);
+          return;
+        }
+
+        const consentEl = formEl.querySelector('input[name="consent"]') as HTMLInputElement | null;
+        if (!consentEl || !consentEl.checked) {
+          failValidation('Please check the consent box to continue.', consentEl);
+          return;
+        }
+
+        // Populate hidden TCPA audit fields at submit time
+        const setHidden = (key: string, value: string) => {
+          const el = formEl.querySelector(`[data-lc="${key}"]`) as HTMLInputElement | null;
+          if (el) el.value = value;
+        };
+        setHidden('source_url', window.location.href);
+        setHidden('user_agent', navigator.userAgent);
+        setHidden('consent_timestamp', new Date().toISOString());
+        const consentText = formEl.querySelector('#lc_consent_text')?.textContent?.trim() ?? '';
+        setHidden('consent_text', consentText);
+
+        // Build payload
+        const formData = new FormData(formEl);
+        const payload: Record<string, string> = {};
+        formData.forEach((value, key) => {
+          payload[key] = typeof value === 'string' ? value : '';
+        });
+
+        const submitBtn = formEl.querySelector('.lead-capture__submit') as HTMLButtonElement | null;
+        const successEl = formEl.parentElement?.querySelector('.lead-capture__success') as HTMLElement | null;
+        const errorEl = formEl.parentElement?.querySelector('.lead-capture__error') as HTMLElement | null;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting…';
+        }
+        if (errorEl) errorEl.hidden = true;
+
+        try {
+          const endpoint = formEl.dataset.endpoint;
+          if (!endpoint) throw new Error('endpoint not configured');
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error('intake responded ' + res.status);
+          formEl.hidden = true;
+          if (successEl) successEl.hidden = false;
+        } catch (err) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Try again';
+          }
+          if (errorEl) errorEl.hidden = false;
+          // Best-effort: log to console for our own debugging
+          console.error('LeadCapture submission failed:', err);
+        }
+      });
+    });
+  })();
+</script>
+
+<style>
+  .lead-capture {
+    background: #fff8ed;
+    border: 2px solid #ffb81c;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 2rem 0 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  .lead-capture__header h2 {
+    margin: 0 0 0.5rem;
+    color: #0a1224;
+    font-size: 1.5rem;
+  }
+  .lead-capture__amount-context {
+    margin: 0 0 1.25rem;
+    color: #444;
+    line-height: 1.5;
+  }
+  .lead-capture__form {
+    background: #ffffff;
+    border: 1px solid #e0d4b4;
+    border-radius: 6px;
+    padding: 1.25rem;
+    margin: 0;
+  }
+  .lead-capture__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 480px) {
+    .lead-capture__row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+  .lead-capture__field {
+    margin-bottom: 0.25rem;
+  }
+  .lead-capture__field label {
+    display: block;
+    margin: 0.75rem 0 0.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .lead-capture__field input,
+  .lead-capture__field textarea {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  .lead-capture__field input:focus,
+  .lead-capture__field textarea:focus {
+    outline: 2px solid #ffb81c;
+    outline-offset: 1px;
+    border-color: #ffb81c;
+  }
+  .lead-capture__honeypot {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .lead-capture__consent {
+    background: #f7f4eb;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1.25rem 0;
+    border: 1px solid #e0d4b4;
+  }
+  .lead-capture__consent-label {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-size: 0.78rem;
+    font-weight: normal;
+    line-height: 1.5;
+    color: #333;
+    cursor: pointer;
+  }
+  .lead-capture__consent-label input[type="checkbox"] {
+    width: auto;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  .lead-capture__validation {
+    color: #b91c1c;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0.75rem 0 0;
+    line-height: 1.4;
+  }
+  .lead-capture__submit {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.85rem 1.5rem;
+    background: #0a1224;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .lead-capture__submit:hover:not(:disabled) {
+    background: #1a2440;
+  }
+  .lead-capture__submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .lead-capture__disclaimer {
+    font-size: 0.72rem;
+    color: #777;
+    margin: 1rem 0 0;
+    line-height: 1.5;
+  }
+  .lead-capture__success {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: #f0fdf4;
+    border: 2px solid #4ade80;
+    border-radius: 6px;
+  }
+  .lead-capture__success h3 {
+    margin: 0 0 0.75rem;
+    color: #14532d;
+  }
+  .lead-capture__success p {
+    margin: 0.5rem 0;
+    color: #333;
+  }
+  .lead-capture__success-secondary {
+    font-size: 0.9rem;
+    color: #666 !important;
+  }
+  .lead-capture__error {
+    background: #fef2f2;
+    border: 2px solid #f87171;
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #7f1d1d;
+  }
+  .lead-capture__error p {
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>

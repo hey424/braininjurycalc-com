@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://braininjurycalc.com/sitemap-index.xml
+Sitemap: https://www.braininjurycalc.com/sitemap-index.xml

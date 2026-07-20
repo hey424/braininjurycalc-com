@@ -3,6 +3,18 @@
   "name": "braininjurycalc-com",
   "compatibility_date": "2026-05-18",
   "assets": {
+    "binding": "ASSETS",
     "directory": "./dist"
-  }
+  },
+  "main": "src/worker.ts",
+  "routes": [
+    {
+      "pattern": "braininjurycalc.com/*",
+      "zone_name": "braininjurycalc.com"
+    },
+    {
+      "pattern": "www.braininjurycalc.com/*",
+      "zone_name": "braininjurycalc.com"
+    }
+  ]
 }
